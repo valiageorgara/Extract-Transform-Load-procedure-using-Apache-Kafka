@@ -37,14 +37,30 @@ MySQL Workbench
 sudo apt update
 sudo apt install mysql-workbench
 ```
-
+mysql-connector
+```bash
+pip install mysql-connector-python
+```
+Kafka
+```bash
+pip install kafka-python
+conda install -c conda-forge kafka-python
+```
+Flask
+```bash
+pip install Flask
+```
+Postman
+```bash
+sudo snap install postman
+```
 PyCharm community edition
 ```bash
 sudo snap install pycharm-community --classic
 ```
 
 ## Usage
-docker commpose command
+docker compose command
 ```bash
 sudo docker-compose up -d
 ```
@@ -120,9 +136,14 @@ services:
 ## Runtime
 First, we have downloaded from [Kaggle](https://www.kaggle.com/ankitkalauni/amazon-top-rated-smartphones-accessories-2021) a dataset for the Amazon Top Rated Smartphones & Accessories 2021 and we have extracted the first column of the dataset into a list.
 
-We connect to the MySQL database and we insert 50, 100 or more from the products, along with an ascending productID key, a random price in the range (300,1000), the currency(€) and a random review number.
+Before any execution, all the topics are deleted, so that they start from offset 0, all the users are deleted from Neo4j, so new ones are created each time and the ETL starts from scratch.
 
-Then, we connect to the Neo4j database and we insert a graph of users, with attributes such as name, productID (a list of random 1 to 5 productIDs, age, and date of purchase.
+We connect to the MySQL database, and we insert 50, 100 or more from the products, along with an ascending productID key, a random price in the range (300,1000), the currency(€) and a random review number.
+
+<a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="images/products.png">
+</a>
+Then, we connect to the Neo4j database, and we insert a graph of users, with attributes such as name, productID (a list of random 1 to 5 productIDs, age, and date of purchase.
 
 <a href="https://github.com/othneildrew/Best-README-Template">
     <img src="images/users.png">
@@ -130,10 +151,12 @@ Then, we connect to the Neo4j database and we insert a graph of users, with attr
 
 We have two scripts for each producer. The ERProducer.py which sends messages to the products-topic. And the GraphProducer.py which sends messages to the users-topic.
 
-The Consumer.py script connects to the MongoDB, fuses the data from both topics and sends it to MongoDB if fused.
+The Consumer.py script connects to the MongoDB and starts accepting messages one-by one from the two topics. Each product message is stored in a list and each time a new product comes, we check a users list, to check if there is data that is not fused. If a user message arrives and the product exists in the products list, then the data is fused and inserted in the MongoDB. The consumer closes after 10 seconds of no messages and the consumer terminal closes after 10000 seconds.
 
 At the end, we can send a GET request at http://localhost:5000/user/USERNAME and see their products.
-
+<a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="images/postman.png">
+</a>
 
 ## Acknowledgments
 I've used this space to list resources I have fount helpful and would like to give credit to. 
